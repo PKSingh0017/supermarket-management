@@ -41,7 +41,7 @@ class OrderItem(models.Model):
         return self.get_total_item_price()
 
 class Order(models.Model):
-    # staff = models.ForeignKey(User, on_delete=models.CASCADE)
+    staff = models.ForeignKey(User, on_delete=models.CASCADE)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     items = models.ManyToManyField(OrderItem)
     start_date = models.DateTimeField(auto_now_add=True)
