@@ -1,14 +1,16 @@
 {% extends "inventory/base.html" %}
 {% block content %}
+<div class="row">
+  <div class="col-md-8">
     {% for item in all_items %}
         <article class="media content-section">
           <div class="media-body">
             <div class="article-metadata">
-              <a class="mr-2" href="">{{ Item.name }}</a>
+              <a class="mr-2" href="">{{ item.cataegory }}</a>
               <small class="text-muted">{{ item.price }}</small>
             </div>
-            <h2><a class="article-title" href="{% url 'post-detail' post.id %}">{{ post.title }}</a></h2>
-            <p class="article-content">{{ Item.category }}</p>
+            <h2><a class="article-title" href="">{{ item.name }}</a></h2>
+            <p class="article-content">{{ item.category }}</p>
           </div>
         </article>
     {% endfor %}
@@ -33,4 +35,20 @@
       {% endif %}
 
     {% endif %}
+  </div>
+  <div class="col-md-4">
+    <div class="content-section">
+      <h3>Our Sidebar</h3>
+      <p class='text-muted'>You can put any information here you'd like.
+        <ul class="list-group">
+        {% for category in all_categories %}
+          <a class="nav-link" href="?categorypk={{ category.pk }}">
+            <li class="list-group-item list-group-item-light">{{ category.name }}</li>
+          </a>
+        {% endfor %}
+        </ul>
+      </p>
+    </div>
+  </div>
+</div>
 {% endblock content %}
