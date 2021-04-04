@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, DetailView, View
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.paginator import Paginator
 
 # Create your views here.
 
@@ -16,6 +17,9 @@ def home(request):
     if categorypk:
         category = Category.objects.get(pk=categorypk)
         all_items = Item.objects.filter(cataegory=category)
+    all_items_p = Paginator(all_items, 10)
+    page = request.GET.get('page')
+    all_items = all_items_p.get_page(page)
     context = {
         'all_items': all_items,
         'all_categories': all_categories
@@ -27,7 +31,12 @@ def about(request):
     return render(request, 'inventory/about.html')
 
 def billing(request):
-    return render(request, 'inventory/billing.html')
+    curr_staff = request.user
+    curr_order = Order.objects.get(staff=curr_staff)
+    context = {
+        'order': curr_order
+    }
+    return render(request, 'inventory/billing.html', context)
 
 @login_required
 def add_to_cart(request, pk):
