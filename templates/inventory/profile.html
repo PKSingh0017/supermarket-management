@@ -1,0 +1,21 @@
+{% extends "inventory/base.html" %}
+{% block content %}
+<div lass="row">
+  {% for order in all_orders %}
+  <div class="col-md-4 mb-4">
+  {% include 'inventory/all_orders.html' %}
+  </div>
+  {% endfor %}
+</div>
+  <div class="col-md-4">
+    <div class="content-section">
+      <h3>Employee details</h3>
+      <p class='text-muted'>{% if user.is_superuser %}You are an admin.{% endif %}
+      <ul class="list-group">
+          <li class="list-group-item list-group-item-light"><strong>Name: </strong> {{ user.first_name }} {{ user.last_name }}</li>
+          <li class="list-group-item list-group-item-light"><strong>Total orders: </strong>{{ num_items }}</li>
+      </ul>
+      </p>
+    </div>
+  </div>
+{% endblock content %}

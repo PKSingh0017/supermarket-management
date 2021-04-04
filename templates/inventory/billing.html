@@ -55,9 +55,32 @@
           </div>
         </div>
     </div>
-    <hr class="mb-4">
     
-    <button class="btn btn-primary btn-lg btn-block" type="submit">Continue to checkout</button>
+    
+    <button type="button" class="btn btn-primary btn-lg btn-block" data-toggle="modal" data-target="#exampleModalCenter">
+      Accept Payment
+    </button>
+
+      <!-- Modal -->
+      <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLongTitle">Payent Confirmation!</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+              <div class="modal-body">
+                Payment reieved of <strong>Rs. {{ order.get_total | floatformat:"2" }}</strong>?
+              </div>
+              <div class="modal-footer">
+                <button class="btn btn-primary" type="submit">Yes</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+              </div>
+          </div>
+        </div>
+      </div>
     </form>
 
   </div>

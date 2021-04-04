@@ -20,6 +20,15 @@ def gen_custid(n):
     id = ''.join(random.choices(string.digits, k=n))
     return int(id)
 
+def profile(request):
+    num_items = Order.objects.filter(staff=request.user).count()
+    all_orders = Order.objects.filter(staff=request.user)
+    context = {
+        'num_items': num_items,
+        'all_orders': all_orders
+    }
+    return render(request, 'inventory/profile.html', context)
+
 def home(request):
     all_items = Item.objects.all()
     all_categories = Category.objects.all()
@@ -41,44 +50,55 @@ def about(request):
 
 def billing(request):
     curr_staff = request.user
-    curr_order = Order.objects.get(staff=curr_staff, ordered=False)
-    if request.method == 'POST':
-        form = BillingForm(request.POST)
-        if form.is_valid():
-            curr_order.firstname = form.cleaned_data.get('firstname')
-            curr_order.lastname = form.cleaned_data.get('lastname')
-            curr_order.phone_number = form.cleaned_data.get('phone_number')
-            curr_order.save()
-            messages.success(request, f"Order created for {curr_order.firstname}")
-            return redirect('payment')
-    else:
-        context = {
-            'order': curr_order
-        }
-        return render(request, 'inventory/billing.html', context)
+    try:
+        curr_order = Order.objects.get(staff=curr_staff, ordered=False)
+        if request.method == 'POST':
+            form = BillingForm(request.POST)
+            if form.is_valid():
+                curr_order.firstname = form.cleaned_data.get('firstname')
+                curr_order.lastname = form.cleaned_data.get('lastname')
+                curr_order.phone_number = form.cleaned_data.get('phone_number')
+                curr_order.save()
+                messages.success(request, f"Order created for {curr_order.firstname}")
+                return redirect('payment')
+            else:
+                messages.success(request, "Enter the customer details")
+                return redirect('billing')
+        else:
+            context = {
+                'order': curr_order
+            }
+            return render(request, 'inventory/billing.html', context)
+    except:
+        messages.warning(request, "Nothing in the cart!")
+        return redirect("home")
     
 
 def payment(request):
-    curr_staff = request.user
-    curr_order = Order.objects.get(staff=curr_staff)
-    new_payment = Payment()
-    new_payment.paymentid = create_paymentid(8)
-    new_payment.staff = curr_staff
-    new_payment.timestamp = timezone.now
-    new_payment.save()
-    curr_order.ordered = True
-    curr_order.payment = new_payment
-    curr_order.paymentid = new_payment.paymentid
-    curr_order.save()
-    order_items = curr_order.items.all()
-    order_items.update(ordered=True)
-    for item in order_items:
-        item.save()
-    messages.success(request, f"Order completed for  {curr_order.firstname}!")
-    context = {
-        'order': curr_order
-    }
-    return render(request, 'inventory/payment_info.html', context)
+    try:
+        curr_staff = request.user
+        curr_order = Order.objects.get(staff=curr_staff, ordered=False)
+        new_payment = Payment()
+        new_payment.paymentid = create_paymentid(8)
+        new_payment.staff = curr_staff
+        new_payment.timestamp = timezone.now
+        new_payment.save()
+        curr_order.ordered = True
+        curr_order.payment = new_payment
+        curr_order.paymentid = new_payment.paymentid
+        curr_order.save()
+        order_items = curr_order.items.all()
+        order_items.update(ordered=True)
+        for item in order_items:
+            item.save()
+        messages.success(request, f"Order completed for  {curr_order.firstname}!")
+        context = {
+            'order': curr_order
+        }
+        return render(request, 'inventory/payment_info.html', context)
+    except:
+        messages.info(request, "Bill for the previous order was paid!")
+        return redirect("/")
 
 
 @login_required
@@ -95,23 +115,29 @@ def add_to_cart(request, pk):
         # check if the order item is in the order
         if order.items.filter(item__pk=item.pk).exists():
             order_item.quantity += 1
+            item.stock -= 1
+            item.save()
             order_item.save()
             messages.info(request, "This item quantity was updated in your cart.")
         else:
             messages.info(request, "This item was added to your cart.")
             order.items.add(order_item)
+            item.stock -= 1
+            item.save()
             return redirect("home")
     else:
         order = Order.objects.create(
             staff=request.user)
         order.items.add(order_item)
+        item.stock -= 1
+        item.save()
         messages.info(request, "This item was added to your cart.")
     return redirect("home")
 
 
 @login_required
-def remove_from_cart(request, slug):
-    item = get_object_or_404(Book, slug=slug)
+def remove_from_cart(request, pk):
+    item = get_object_or_404(Item, pk=pk)
     order_qs = Order.objects.filter(
         staff=request.user,
         ordered=False
@@ -127,6 +153,8 @@ def remove_from_cart(request, slug):
             )[0]
             order.items.remove(order_item)
             order_item.delete()
+            item.stock += order_item.quantity
+            item.save()
             messages.info(request, "Item Removed!")
             return redirect("order-summary")
         else:
@@ -156,9 +184,13 @@ def remove_single_item_from_cart(request, pk):
             )[0]
             if order_item.quantity > 1:
                 order_item.quantity -= 1
+                item.stock += 1
+                item.save()
                 order_item.save()
             else:
                 order.items.remove(order_item)
+                item.stock += 1
+                item.save()
             messages.info(request, "Item quantity was updated.")
             return redirect("order-summary")
         else:

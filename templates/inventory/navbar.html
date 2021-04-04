@@ -20,7 +20,7 @@
               {% if request.user.is_superuser %}
                 <a class="nav-item nav-link" href="">New Entry</a>
               {% endif %}
-              <a class="nav-item nav-link" href="">Profile</a>
+              <a class="nav-item nav-link" href="{% url 'profile' %}">Profile</a>
               <a class="nav-item nav-link" href="{% url 'account_logout' %}">Logout</a>
             {% else %}
               <a class="nav-item nav-link" href="{% url 'account_login' %}">Login</a>
