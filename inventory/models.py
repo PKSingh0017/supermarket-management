@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from customer.models import Customer
+from django.shortcuts import reverse
 
 # Create your models here.
 
@@ -17,11 +18,25 @@ class Item(models.Model):
     discount_percentage = models.IntegerField()
     stock = models.IntegerField()
 
+    def get_add_to_cart_url(self):
+        return reverse("add-to-cart", kwargs={
+            'pk': self.pk
+        })
+
+    def get_remove_from_cart_url(self):
+        return reverse("remove-from-cart", kwargs={
+            'slug': self.slug
+        })
+
+    def actual_price(self):
+        return self.price - (self.price * self.discount_percentage)/100
+
 class OrderItem(models.Model):
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
-    paid = models.BooleanField(default=False)
+    staff = models.ForeignKey(User, on_delete=models.CASCADE)
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True)
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
     quantity = models.IntegerField(default=1)
+    ordered = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.quantity} of {self.item.name}"
@@ -42,11 +57,11 @@ class OrderItem(models.Model):
 
 class Order(models.Model):
     staff = models.ForeignKey(User, on_delete=models.CASCADE)
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True)
     items = models.ManyToManyField(OrderItem)
     start_date = models.DateTimeField(auto_now_add=True)
     ordered_date = models.DateTimeField(null=True)
-    paid = models.BooleanField(default=False)
+    ordered = models.BooleanField(default=False)
 
     def __str__(self):
         return self.customer.firstname

@@ -7,9 +7,13 @@
           <div class="media-body">
             <div class="article-metadata">
               <a class="mr-2" href="">{{ item.cataegory }}</a>
-              <small class="text-muted">{{ item.price }}</small>
+              <small class="text-muted"><del>Rs {{ item.price }}</del></small>
+              <strong>Rs {{ item.actual_price }}</strong>
             </div>
             <h2><a class="article-title" href="">{{ item.name }}</a></h2>
+            <a href="{{ item.get_add_to_cart_url }}">
+              <button class="btn btn-outline-info" type="submit">Add</button>
+            </a>
             <p class="article-content">{{ item.category }}</p>
           </div>
         </article>
@@ -38,8 +42,8 @@
   </div>
   <div class="col-md-4">
     <div class="content-section">
-      <h3>Our Sidebar</h3>
-      <p class='text-muted'>You can put any information here you'd like.
+      <h3>Categories</h3>
+      <p class='text-muted'>List of all categories.
         <ul class="list-group">
         {% for category in all_categories %}
           <a class="nav-link" href="?categorypk={{ category.pk }}">

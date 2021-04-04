@@ -1,3 +1,4 @@
+{% load cart_template_tags %}
 <header class="site-header">
     <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
       <div class="container">
@@ -10,6 +11,7 @@
             <a class="nav-item nav-link" href="{% url 'home' %}">Home</a>
             {% if user.is_authenticated %}
               <a class="nav-item nav-link" href="{% url 'billing' %}">Billing</a>
+              <a class="nav-item nav-link" href="{% url 'order-summary' %}">cart: {{ request.user | cart_item_count }}</a>
             {% endif %}
           </div>
           <!-- Navbar Right Side -->
