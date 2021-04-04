@@ -5,7 +5,7 @@
   <main class="mt-lg-3 mt-3 pt-lg-4" style="font-size: 1.5rem;">
     <div class="container">
       <div class="card bg-secondary mb-3">
-          <h2 class="my-1 h2 text-center" style="color: white;">Order Placed</h2>
+          <h2 class="my-1 h2 text-center" style="color: white;">Payment Recieved!</h2>
       </div>
       <div class="row">
         <div class="col-md-12 mb-4">
@@ -98,8 +98,8 @@
             <div class="col-sm-6">
               <div class="card mb-4 ml-3 mr-3" style="box-shadow: 0px 0px 10px 0px rgb(0, 0, 0, 0.23)">
                 <div class="card-body">
-                  Name: {{ order.customer.firstname }} {{ order.customer.lastname }}<br>
-                  Phone Number: {{ order.customer.phone_number }}<br>
+                  Name: {{ order.firstname }} {{ order.lastname }}<br>
+                  Phone Number: {{ order.phone_number }}<br>
                 </div>
               </div>
             </div>

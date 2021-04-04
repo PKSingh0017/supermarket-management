@@ -1,6 +1,7 @@
 
     <h4 class="d-flex justify-content-between align-items-center mb-3">
-    <span class="text-muted">This cart</span>
+    <span class="text-muted">Date:{{ order.payment.timestamp|date:'d-m-Y' }}</span>
+    <span class="text-muted">Time:{{ order.payment.timestamp|date:'H:i' }}</span>
     <span class="badge badge-info badge-pill">{{ order.items.count }}</span>
     </h4>
 
