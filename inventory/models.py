@@ -4,15 +4,15 @@ from django.shortcuts import reverse
 
 # Create your models here.
 
-class Customer(models.Model):
-    firstname = models.CharField(max_length=50)
-    lastname = models.CharField(max_length=50)
-    phone_number = models.CharField(max_length=15)
-    brownie_points = models.IntegerField(default=0)
-    slug = models.SlugField(unique=True)
+# class Customer(models.Model):
+#     firstname = models.CharField(max_length=50)
+#     lastname = models.CharField(max_length=50)
+#     phone_number = models.CharField(max_length=15)
+#     brownie_points = models.IntegerField(default=0)
+#     slug = models.SlugField(unique=True)
 
-    def __str__(self):
-        return render(self.firstname)
+#     def __str__(self):
+#         return render(self.firstname)
 
 class Category(models.Model):
     name = models.CharField(max_length=20)
@@ -45,7 +45,6 @@ class Item(models.Model):
 
 class OrderItem(models.Model):
     staff = models.ForeignKey(User, on_delete=models.CASCADE)
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True)
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
     quantity = models.IntegerField(default=1)
     ordered = models.BooleanField(default=False)
@@ -73,8 +72,10 @@ class OrderItem(models.Model):
 
 
 class Order(models.Model):
+    firstname = models.CharField(max_length=50, null=True)
+    lastname = models.CharField(max_length=50, null=True)
+    phone_number = models.CharField(max_length=15, null=True)
     staff = models.ForeignKey(User, on_delete=models.CASCADE)
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True)
     items = models.ManyToManyField(OrderItem)
     start_date = models.DateTimeField(auto_now_add=True)
     ordered_date = models.DateTimeField(null=True)
@@ -104,7 +105,6 @@ class Order(models.Model):
 class Payment(models.Model):
     paymentid = models.CharField(max_length=8)
     staff = models.ForeignKey(User, on_delete=models.CASCADE)
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

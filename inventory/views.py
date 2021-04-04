@@ -7,7 +7,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, DetailView, View
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator
-from .models import Item, Category, OrderItem,  Order, Payment, Customer
+from .models import Item, Category, OrderItem,  Order, Payment
 from .forms import BillingForm
 import random
 import string
@@ -15,6 +15,10 @@ import string
 
 def create_paymentid(n):
     return ''.join(random.choices(string.ascii_lowercase + string.digits, k=n))
+
+def gen_custid(n):
+    id = ''.join(random.choices(string.digits, k=n))
+    return int(id)
 
 def home(request):
     all_items = Item.objects.all()
@@ -41,23 +45,12 @@ def billing(request):
     if request.method == 'POST':
         form = BillingForm(request.POST)
         if form.is_valid():
-            try:
-                num = form.cleaned_data.get('phone_number')
-                cust = Customer.objects.get(phone_number=num)
-                curr_order.customer = cust
-                messages.success(request, "Order created for {cust.firstname}!")
-                return redirect('/payment/')
-            except:
-                new_customer = Customer()
-                new_customer.firstname = form.cleaned_data.get('firstname')
-                new_customer.lastname = form.cleaned_data.get('lastname')
-                new_customer.phone_number = form.cleaned_data.get('phone_number')
-                new_customer.slug = slugify(new_customer.phone_number)
-                new_customer.save()
-                curr_order.customer = new_customer
-                curr_order.save()
-                messages.success(request, "Order created for {new_customer.firstname}")
-                return redirect('payment')
+            curr_order.firstname = form.cleaned_data.get('firstname')
+            curr_order.lastname = form.cleaned_data.get('lastname')
+            curr_order.phone_number = form.cleaned_data.get('phone_number')
+            curr_order.save()
+            messages.success(request, f"Order created for {curr_order.firstname}")
+            return redirect('payment')
     else:
         context = {
             'order': curr_order
@@ -66,20 +59,18 @@ def billing(request):
     
 
 def payment(request):
-    # try:
     curr_staff = request.user
     curr_order = Order.objects.get(staff=curr_staff)
     new_payment = Payment()
     new_payment.paymentid = create_paymentid(8)
     new_payment.staff = curr_staff
-    new_payment.customer = curr_order.customer
     new_payment.timestamp = timezone.now
     new_payment.save()
     curr_order.ordered = True
     curr_order.payment = new_payment
     curr_order.paymentid = new_payment.paymentid
     curr_order.save()
-    order_items = order.items.all()
+    order_items = curr_order.items.all()
     order_items.update(ordered=True)
     for item in order_items:
         item.save()
@@ -88,9 +79,6 @@ def payment(request):
         'order': curr_order
     }
     return render(request, 'inventory/payment_info.html', context)
-    # except:
-    #     messages.error(request, "Order not created")
-    #     return redirect('billing')
 
 
 @login_required

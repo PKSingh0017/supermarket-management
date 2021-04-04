@@ -92,7 +92,7 @@ WSGI_APPLICATION = 'management.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'supermarket1',
+        'NAME': 'supermarket2',
         'HOST': '68.183.81.71',
         'USER': 'pk',
         'PASSWORD': 'j2fkpl4sq',
