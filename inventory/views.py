@@ -41,7 +41,7 @@ def about(request):
 
 def billing(request):
     curr_staff = request.user
-    curr_order = Order.objects.get(staff=curr_staff)
+    curr_order = Order.objects.get(staff=curr_staff, ordered=False)
     if request.method == 'POST':
         form = BillingForm(request.POST)
         if form.is_valid():
