@@ -1,9 +1,18 @@
 from django.db import models
 from django.contrib.auth.models import User
-from customer.models import Customer
 from django.shortcuts import reverse
 
 # Create your models here.
+
+class Customer(models.Model):
+    firstname = models.CharField(max_length=50)
+    lastname = models.CharField(max_length=50)
+    phone_number = models.CharField(max_length=15)
+    brownie_points = models.IntegerField(default=0)
+    slug = models.SlugField(unique=True)
+
+    def __str__(self):
+        return render(self.firstname)
 
 class Category(models.Model):
     name = models.CharField(max_length=20)
@@ -17,6 +26,9 @@ class Item(models.Model):
     price = models.IntegerField()
     discount_percentage = models.IntegerField()
     stock = models.IntegerField()
+
+    def __str__(self):
+        return self.name
 
     def get_add_to_cart_url(self):
         return reverse("add-to-cart", kwargs={
@@ -54,6 +66,11 @@ class OrderItem(models.Model):
         if self.item.discount_percentage:
             return self.get_total_discount_item_price()
         return self.get_total_item_price()
+    
+    
+    def __str__(self):
+        return f"{self.quantity} of {self.item.name}"
+
 
 class Order(models.Model):
     staff = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -62,6 +79,9 @@ class Order(models.Model):
     start_date = models.DateTimeField(auto_now_add=True)
     ordered_date = models.DateTimeField(null=True)
     ordered = models.BooleanField(default=False)
+    paymentid = models.CharField(max_length=8, null=True)
+    payment = models.ForeignKey(
+        'Payment', on_delete=models.SET_NULL, blank=True, null=True)
 
     def __str__(self):
         return self.customer.firstname
@@ -77,5 +97,18 @@ class Order(models.Model):
         for order_item in self.items.all():
             total += order_item.quantity
         return total
+    
+    def __str__(self):
+        return f"order of {self.customer.firstname} created by {self.staff.username}"
+
+class Payment(models.Model):
+    paymentid = models.CharField(max_length=8)
+    staff = models.ForeignKey(User, on_delete=models.CASCADE)
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"payment of {self.customer.firstname} reieved by {self.staff.username}"
+
 
 

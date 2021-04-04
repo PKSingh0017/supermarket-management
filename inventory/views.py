@@ -1,14 +1,20 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Item, Category, OrderItem,  Order
 from django.contrib.auth.decorators import login_required
+from django.template.defaultfilters import slugify
 from django.contrib import messages
+from django.utils import timezone
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, DetailView, View
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator
-
+from .models import Item, Category, OrderItem,  Order, Payment, Customer
+from .forms import BillingForm
+import random
+import string
 # Create your views here.
 
+def create_paymentid(n):
+    return ''.join(random.choices(string.ascii_lowercase + string.digits, k=n))
 
 def home(request):
     all_items = Item.objects.all()
@@ -26,17 +32,66 @@ def home(request):
     }
     return render(request, 'inventory/home.html', context)
 
-
 def about(request):
     return render(request, 'inventory/about.html')
 
 def billing(request):
     curr_staff = request.user
     curr_order = Order.objects.get(staff=curr_staff)
+    if request.method == 'POST':
+        form = BillingForm(request.POST)
+        if form.is_valid():
+            try:
+                num = form.cleaned_data.get('phone_number')
+                cust = Customer.objects.get(phone_number=num)
+                curr_order.customer = cust
+                messages.success(request, "Order created for {cust.firstname}!")
+                return redirect('/payment/')
+            except:
+                new_customer = Customer()
+                new_customer.firstname = form.cleaned_data.get('firstname')
+                new_customer.lastname = form.cleaned_data.get('lastname')
+                new_customer.phone_number = form.cleaned_data.get('phone_number')
+                new_customer.slug = slugify(new_customer.phone_number)
+                new_customer.save()
+                curr_order.customer = new_customer
+                curr_order.save()
+                messages.success(request, "Order created for {new_customer.firstname}")
+                return redirect('payment')
+    else:
+        context = {
+            'order': curr_order
+        }
+        return render(request, 'inventory/billing.html', context)
+    
+
+def payment(request):
+    # try:
+    curr_staff = request.user
+    curr_order = Order.objects.get(staff=curr_staff)
+    new_payment = Payment()
+    new_payment.paymentid = create_paymentid(8)
+    new_payment.staff = curr_staff
+    new_payment.customer = curr_order.customer
+    new_payment.timestamp = timezone.now
+    new_payment.save()
+    curr_order.ordered = True
+    curr_order.payment = new_payment
+    curr_order.paymentid = new_payment.paymentid
+    curr_order.save()
+    order_items = order.items.all()
+    order_items.update(ordered=True)
+    for item in order_items:
+        item.save()
+    messages.sucess(request, "Order completed for ", curr_order.customer.firstname, '!')
     context = {
         'order': curr_order
     }
-    return render(request, 'inventory/billing.html', context)
+    return render(request, 'inventory/payment_info.html', context)
+    # except:
+    #     messages.error(request, "Order not created")
+    #     return redirect('billing')
+
 
 @login_required
 def add_to_cart(request, pk):

@@ -33,7 +33,6 @@ ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'inventory',
-    'customer',
     'crispy_forms',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -93,9 +92,9 @@ WSGI_APPLICATION = 'management.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'supermarket',
+        'NAME': 'supermarket1',
         'HOST': '68.183.81.71',
-        'USER': 'pksinghremote',
+        'USER': 'pk',
         'PASSWORD': 'j2fkpl4sq',
     }
 }

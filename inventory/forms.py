@@ -11,3 +11,9 @@ class CreateOrderForm(forms.ModelForm):
         fields = [
             'items'
         ]
+
+
+class BillingForm(forms.Form):
+    firstname = forms.CharField(required=True)
+    lastname = forms.CharField(required=True)
+    phone_number = forms.IntegerField(required=True)
