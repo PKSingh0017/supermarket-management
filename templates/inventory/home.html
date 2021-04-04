@@ -7,9 +7,14 @@
           <div class="media-body">
             <div class="article-metadata">
               <a class="mr-2" href="">{{ item.cataegory }}</a>
+              <small class="text-muted"> | Price: </small>
               <small class="text-muted"><del>Rs {{ item.price }}</del></small>
               <strong>Rs {{ item.actual_price }}</strong>
+              
+              <small class="text-muted"> | Stock: </small>
+              <strong>{{ item.stock }}</strong>
             </div>
+            
             <h2><a class="article-title" href="">{{ item.name }}</a></h2>
             <a href="{{ item.get_add_to_cart_url }}">
               <button class="btn btn-outline-info" type="submit">Add</button>
