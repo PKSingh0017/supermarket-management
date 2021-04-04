@@ -74,7 +74,7 @@ def payment(request):
     order_items.update(ordered=True)
     for item in order_items:
         item.save()
-    messages.sucess(request, "Order completed for ", curr_order.customer.firstname, '!')
+    messages.success(request, f"Order completed for  {curr_order.firstname}!")
     context = {
         'order': curr_order
     }

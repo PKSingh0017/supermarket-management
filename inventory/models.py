@@ -100,7 +100,7 @@ class Order(models.Model):
         return total
     
     def __str__(self):
-        return f"order of {self.customer.firstname} created by {self.staff.username}"
+        return f"order of {self.firstname} created by {self.staff.username}"
 
 class Payment(models.Model):
     paymentid = models.CharField(max_length=8)
@@ -108,7 +108,7 @@ class Payment(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"payment of {self.customer.firstname} reieved by {self.staff.username}"
+        return self.paymentid
 
 
 
