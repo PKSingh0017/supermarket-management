@@ -4,7 +4,7 @@
 
 <main class="mt-5">
     <div class="container">
-        <div class="jumbotron card card-image shadow-1-strong" style="background-color: #fff0d35d;">
+        <div class="jumbotron card card-image shadow-1-strong" style="background-color: #fff;">
             <div class="text-black text-center py-5 px-4">
                 <div class="table-responsive text-nowrap">
                     <h2 class="my-3 h1 text-center pb-3" style="color: #323232;"><strong>ORDER SUMMARY</strong></h2>
@@ -33,11 +33,11 @@
                                             class="fas fa-plus ml-2"></i></a>
                                 </td>
                                 <td>
-                                    {% if order_item.item.discount_price %}
+                                    {% if order_item.item.discount_percentage %}
                                     Rs{{ order_item.get_total_discount_item_price }}
                                     <span class="badge badge-primary">Saving Rs{{ order_item.get_amount_saved }}</span>
                                     {% else %}
-                                    Rs{{ order_item.get_total_item_price }}
+                                    Rs{{ order_item.get_final_price }}
                                     {% endif %}
                                     
                                 </td>
